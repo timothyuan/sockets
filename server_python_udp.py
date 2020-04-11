@@ -47,34 +47,40 @@ def sendFile(sock, address, file):
                 sock.settimeout(None)
             i+=1
         if(i==3):
+            f.close()
             print('File transmission failed.')
             return False
         text = f.read(1024)
+    f.close()
     print('Successful file transmission')
     return True
 
-# create a udp socket
-s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s.bind(('', PORT))
+def main():
+    # create a udp socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.bind(('', PORT))
 
-while True:
-    test, addr = s.recvfrom(1024)
-    if test.decode('utf-8') == 'test':
-        s.sendto('test'.encode('utf-8'), addr)
+    while True:
+        test, addr = s.recvfrom(1024)
+        if test.decode('utf-8') == 'test':
+            s.sendto('test'.encode('utf-8'), addr)
 
-    cmd = receiveCommand(s)
-    if cmd == 'error':
-        continue
+        cmd = receiveCommand(s)
+        if cmd == 'error':
+            continue
 
-    print(cmd)
-    file = cmd.split(' > ')[1]
+        print(cmd)
+        file = cmd.split(' > ')[1]
 
-    try:
-        subprocess.check_output(cmd, shell=True)
-    except subprocess.CalledProcessError:
-        s.sendto('error'.encode('utf-8'), addr)
-        continue
+        try:
+            subprocess.check_output(cmd, shell=True)
+        except subprocess.CalledProcessError:
+            s.sendto('error'.encode('utf-8'), addr)
+            continue
 
 
-    if not sendFile(s, addr, file):
-        continue
+        if not sendFile(s, addr, file):
+            continue
+
+if __name__ == '__main__':
+    main()

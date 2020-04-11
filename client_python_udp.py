@@ -46,7 +46,7 @@ def executeCommand(cmd, sock, address):
     sock.settimeout(None)
     return False
 
-def getResponse(sock, file):
+def getResponse(sock):
     total, addr = sock.recvfrom(1024)
 
     if total.decode('utf-8') == 'error':
@@ -57,7 +57,7 @@ def getResponse(sock, file):
     length, addr = sock.recvfrom(1024)
     text, addr = sock.recvfrom(1024)
 
-    f = open(file, 'w')
+    f = open('client_output.txt', 'w')
     f.write(text.decode('utf-8'))
     current = int(length.decode('utf-8'))
 
@@ -65,8 +65,8 @@ def getResponse(sock, file):
 
     while(current!=total):
         try:
-            length, addr = sock.recvfrom(1024)
             sock.settimeout(0.5)
+            length, addr = sock.recvfrom(1024)
             deadline = time.time()+0.5
             text, addr = sock.recvfrom(1024)
             while(int(length.decode('utf-8'))!=len(text.decode('utf-8'))):
@@ -75,14 +75,15 @@ def getResponse(sock, file):
             sock.sendto('ACK'.encode('utf-8'), addr)
             sock.settimeout(None)
         except socket.timeout:
-            print('Did not receive response.')
+            print('Did not receive response')
             sock.settimeout(None)
+            f.close()
             return False
         f.write(text.decode('utf-8'))
         current += int(length.decode('utf-8'))
     f.close()
     sock.close()
-    print('File ', file, ' saved.')
+    print('File client_output.txt saved.')
     return True
 
 
@@ -116,7 +117,7 @@ def main():
     if not executeCommand(cmd, s, addr):
         sys.exit()
 
-    if not getResponse(s, file):
+    if not getResponse(s):
         sys.exit()
 
 if __name__ == '__main__':
