@@ -1,5 +1,6 @@
 import socket
 import subprocess
+import sys
 
 def receiveCommand(con, addr):
     # receive command from client
@@ -34,10 +35,18 @@ def sendFile(file, con):
     return True
 
 def main():
+    PORT = int(sys.argv[1])
+
     # create a tcp socket
-    PORT = 65432
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(('', PORT))
+
+    # attempt to bind to port
+    try:
+        s.bind(('', PORT))
+    except Exception:
+        print('The port is already in use')
+        sys.exit()
+
     s.listen()
 
     while True:

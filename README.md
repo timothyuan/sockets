@@ -10,10 +10,10 @@ This python project implements client-server communication via TCP and UDP socke
 - Libraries/Frameworks: socket, sys, time, subprocess, os, unittest, mock
 
 ## Running the code
-The following example is the TCP implementation. Running the UDP is the exact same, just substitute the respective scripts for client and server.3. 
-1. Open a terminal window and run the server
+The following example is the TCP implementation. Running the UDP is the exact same, just substitute the respective scripts for client and server.3.
+1. Open a terminal window and run the server with port number as a command line argument
 <pre>
-python server_python_tcp.py
+python server_python_tcp.py 65432
 </pre>
 2. Open another terminal window and start the client
 <pre>
@@ -25,7 +25,7 @@ Enter server name or IP address: localhost
 Enter port: 65432
 Enter command: ls > output.txt
 </pre>
-Note: The server will run on port 65432. All commands must be in the form command > file.txt, where file.txt is the name of the file saved on the server. File saved on the client side is called client_output.txt.
+Note: All commands must be in the form command > file.txt, where file.txt is the name of the file saved on the server. File saved on the client side is called client_output.txt.
 
 ## Running tests
 You can run the test the exact same way you run the server and client scripts.

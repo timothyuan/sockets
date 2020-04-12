@@ -61,10 +61,17 @@ def sendFile(sock, address, file):
     return True
 
 def main():
+    PORT = int(sys.argv[1])
+
     # create a udp socket
-    PORT = 65432
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.bind(('', PORT))
+
+    # attempt to bind to port
+    try:
+        s.bind(('', PORT))
+    except Exception:
+        print('The port is already in use')
+        sys.exit()
 
     while True:
         # test message to check connection
