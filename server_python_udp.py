@@ -4,13 +4,13 @@ import time
 import sys
 import os
 
-PORT = 65432
-
 def receiveCommand(sock):
+    # receive length of command
     length, addr = sock.recvfrom(1024)
     try:
         sock.settimeout(0.5)
         deadline = time.time() + 0.5
+        # receive a command with valid length until 0.5 s timeout
         cmd, addr = sock.recvfrom(1024)
         while (int(length.decode('utf-8'))!=len(cmd.decode('utf-8'))):
             sock.settimeout(deadline-time.time())
@@ -24,17 +24,22 @@ def receiveCommand(sock):
         return 'error'
 
 def sendFile(sock, address, file):
+    # read from file
     f = open(file, 'r')
     text = f.read(1024)
 
+    # send size of file to client
     sock.sendto(str(os.path.getsize(file)).encode('utf-8'), address)
 
+    # while text exists in file
     while(text):
         i = 0
+        # attempt to send each line 3 times
         while(i < 3):
             try:
                 sock.sendto(str(len(text)).encode('utf-8'), address)
                 sock.sendto(text.encode('utf-8'), address)
+                # 0.5 seconds for client to ACK
                 sock.settimeout(0.5)
                 deadline = time.time() + 0.5
                 response, address = sock.recvfrom(1024)
@@ -57,10 +62,12 @@ def sendFile(sock, address, file):
 
 def main():
     # create a udp socket
+    PORT = 65432
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.bind(('', PORT))
 
     while True:
+        # test message to check connection
         test, addr = s.recvfrom(1024)
         if test.decode('utf-8') == 'test':
             s.sendto('test'.encode('utf-8'), addr)
@@ -72,6 +79,7 @@ def main():
         print(cmd)
         file = cmd.split(' > ')[1]
 
+        # execute received command
         try:
             subprocess.check_output(cmd, shell=True)
         except subprocess.CalledProcessError:

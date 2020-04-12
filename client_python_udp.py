@@ -18,6 +18,7 @@ def checkConnection(sock, address):
         sock.sendto('test'.encode('utf-8'), address)
         sock.settimeout(1)
         test, address = sock.recvfrom(1024)
+        # check for incorrect server response
         if test.decode('utf-8') != 'test':
             raise Exception
         return True
@@ -28,6 +29,7 @@ def checkConnection(sock, address):
 def executeCommand(cmd, sock, address):
     for _ in range(0,3):
         try:
+            # send command to server
             sock.sendto(str(len(cmd)).encode('utf-8'), address)
             sock.sendto(cmd.encode('utf-8'), address)
             sock.settimeout(1)
@@ -47,6 +49,7 @@ def executeCommand(cmd, sock, address):
     return False
 
 def getResponse(sock):
+    # get size of total message
     total, addr = sock.recvfrom(1024)
 
     if total.decode('utf-8') == 'error':
@@ -57,12 +60,14 @@ def getResponse(sock):
     length, addr = sock.recvfrom(1024)
     text, addr = sock.recvfrom(1024)
 
+    # write to client_output.txt
     f = open('client_output.txt', 'w')
     f.write(text.decode('utf-8'))
     current = int(length.decode('utf-8'))
 
     sock.sendto('ACK'.encode('utf-8'), addr)
 
+    # while the total length is not reached, receive more data
     while(current!=total):
         try:
             sock.settimeout(0.5)
