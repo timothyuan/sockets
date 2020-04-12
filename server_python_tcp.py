@@ -27,8 +27,10 @@ def sendFile(file, con):
             data = f.read(1024)
         except Exception:
             f.close()
+            print('File transmission failed.')
             return False
     f.close()
+    print('Successful file transmission.')
     return True
 
 def main():
@@ -49,10 +51,7 @@ def main():
 
         # sends output back to client
         file = cmd.split(' > ')[1]
-        if sendFile(file, con):
-            print('Successful file transmission.')
-        else:
-            print('File transmission failed.')
+        sendFile(file, con)
 
         con.shutdown(socket.SHUT_RDWR)
     s.close()
